@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lbasg-lab/cicd-pipelines/schemas/cicd-config.schema.json",
+  "title": "lbasg-lab CI/CD Configuration",
+  "description": "Configuration contract for projects consuming lbasg-lab/cicd-pipelines",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "runtime"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Version of the CI/CD configuration contract"
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stack",
+        "version",
+        "package_manager"
+      ],
+      "properties": {
+        "stack": {
+          "type": "string",
+          "enum": [
+            "node"
+          ],
+          "description": "Runtime stack used by the project"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+(\\.[0-9]+)*$",
+          "description": "Version of the runtime"
+        },
+        "package_manager": {
+          "type": "string",
+          "enum": [
+            "npm"
+          ],
+          "description": "Package manager used by the runtime"
+        }
+      }
+    }
+  }
+}

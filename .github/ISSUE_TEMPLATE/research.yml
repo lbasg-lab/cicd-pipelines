@@ -1,0 +1,41 @@
+name: 🔬 Research
+description: Investigate a technology or evaluate different approaches.
+title: "[Research]: "
+labels:
+  - research
+
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      placeholder: What needs to be investigated?
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      placeholder: Why is this research necessary?
+
+  - type: textarea
+    id: questions
+    attributes:
+      label: Research Questions
+      placeholder: |
+        - Question 1
+        - Question 2
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected Outcome
+      placeholder: What decision or recommendation should this research produce?
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes

@@ -1,0 +1,36 @@
+name: 📖 Documentation
+description: Create or improve project documentation.
+title: "[Documentation]: "
+labels:
+  - documentation
+
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      placeholder: What documentation should be created or improved?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Documentation Scope
+      placeholder: Which files or sections are affected?
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - [ ] Documentation updated
+        - [ ] Examples reviewed
+        - [ ] Links verified
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes

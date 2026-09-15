@@ -1,0 +1,69 @@
+name: Reusable Node.js CI
+
+on:
+  workflow_call:
+    inputs:
+      runtime-version:
+        description: Node.js runtime version
+        required: true
+        type: string
+
+      package-manager:
+        description: Package manager
+        required: true
+        type: string
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout consumer repository
+        uses: actions/checkout@v4
+        with:
+          path: consumer
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.runtime-version }}
+
+      - name: Setup package manager
+        working-directory: consumer
+        run: |
+          case "${{ inputs.package-manager }}" in
+            npm)
+              echo "PACKAGE_MANAGER=npm" >> "$GITHUB_ENV"
+              ;;
+            pnpm)
+              corepack enable
+              echo "PACKAGE_MANAGER=pnpm" >> "$GITHUB_ENV"
+              ;;
+            yarn)
+              corepack enable
+              echo "PACKAGE_MANAGER=yarn" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "::error::Unsupported package manager: ${{ inputs.package-manager }}"
+              exit 1
+              ;;
+          esac
+
+      - name: Install dependencies
+        working-directory: consumer
+        run: |
+          case "$PACKAGE_MANAGER" in
+            npm)
+              npm ci
+              ;;
+            pnpm)
+              pnpm install --frozen-lockfile
+              ;;
+            yarn)
+              yarn install --immutable
+              ;;
+          esac
+
+      - name: Build
+        working-directory: consumer
+        run: "$PACKAGE_MANAGER run build"

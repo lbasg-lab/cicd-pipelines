@@ -1,0 +1,55 @@
+name: Reusable CI
+
+on:
+  workflow_call:
+    inputs:
+      config:
+        description: Path to the CI/CD configuration file
+        required: false
+        type: string
+        default: .cicd-config.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    outputs:
+      runtime_stack: ${{ steps.validate.outputs.runtime_stack }}
+      runtime_version: ${{ steps.validate.outputs.runtime_version }}
+      package_manager: ${{ steps.validate.outputs.package_manager }}
+
+    steps:
+      - name: Checkout consumer repository
+        uses: actions/checkout@v4
+        with:
+          path: consumer
+
+      - name: Checkout CI/CD framework
+        uses: actions/checkout@v4
+        with:
+          repository: lbasg-lab/cicd-pipelines
+          ref: v1.0.0
+          path: cicd-pipelines
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install framework dependencies
+        run: pip install -r cicd-pipelines/requirements.txt
+
+      - name: Validate configuration
+        id: validate
+        run: |
+          python cicd-pipelines/scripts/validate_config.py \
+            "consumer/${{ inputs.config }}" \
+            --github-output "$GITHUB_OUTPUT"
+
+  node:
+    needs: validate
+    if: needs.validate.outputs.runtime_stack == 'node'
+    uses: lbasg-lab/cicd-pipelines/.github/workflows/node-ci.yml@v1.0.0
+    with:
+      runtime-version: ${{ needs.validate.outputs.runtime_version }}
+      package-manager: ${{ needs.validate.outputs.package_manager }}
