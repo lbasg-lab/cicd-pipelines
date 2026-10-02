@@ -1,0 +1,42 @@
+name: Reusable Terraform CI
+
+on:
+  workflow_call:
+    inputs:
+      terraform-version:
+        description: Terraform version to use
+        required: true
+        type: string
+
+      working-directory:
+        description: Terraform working directory
+        required: false
+        type: string
+        default: .
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - name: Checkout consumer repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        run: terraform validate
+        

@@ -17,6 +17,7 @@ jobs:
       runtime_stack: ${{ steps.validate.outputs.runtime_stack }}
       runtime_version: ${{ steps.validate.outputs.runtime_version }}
       package_manager: ${{ steps.validate.outputs.package_manager }}
+      working_directory: ${{ steps.validate.outputs.working_directory }}
 
     steps:
       - name: Checkout consumer repository
@@ -53,3 +54,11 @@ jobs:
     with:
       runtime-version: ${{ needs.validate.outputs.runtime_version }}
       package-manager: ${{ needs.validate.outputs.package_manager }}
+
+  terraform:
+    needs: validate
+    if: needs.validate.outputs.runtime_stack == 'terraform'
+    uses: lbasg-lab/cicd-pipelines/.github/workflows/terraform-ci.yml@feature/terraform-ci
+    with:
+      terraform-version: ${{ needs.validate.outputs.runtime_version }}
+      working-directory: ${{ needs.validate.outputs.working_directory }}
