@@ -20,14 +20,14 @@
       "additionalProperties": false,
       "required": [
         "stack",
-        "version",
-        "package_manager"
+        "version"
       ],
       "properties": {
         "stack": {
           "type": "string",
           "enum": [
-            "node"
+            "node",
+            "terraform"
           ],
           "description": "Runtime stack used by the project"
         },
@@ -42,8 +42,37 @@
             "npm"
           ],
           "description": "Package manager used by the runtime"
+        },
+        "working_directory": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Working directory for the stack relative to the repository root"
         }
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "stack": {
+              "const": "node"
+            }
+          },
+          "required": [
+            "package_manager"
+          ]
+        },
+        {
+          "properties": {
+            "stack": {
+              "const": "terraform"
+            }
+          },
+          "not": {
+            "required": [
+              "package_manager"
+            ]
+          }
+        }
+      ]
     }
   }
 }

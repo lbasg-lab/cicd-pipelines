@@ -17,6 +17,15 @@ def valid_config():
         },
     }
 
+def valid_terraform_config():
+    return {
+        "version": 1,
+        "runtime": {
+            "stack": "terraform",
+            "version": "1.16.2",
+            "working_directory": "terraform",
+        },
+    }
 
 @pytest.mark.parametrize("version", ["22", "24"])
 def test_supported_node_version(version):
@@ -110,4 +119,43 @@ def test_schema_rejects_unknown_runtime_property():
     config["runtime"]["node_version"] = "24"
 
     with pytest.raises(ConfigurationError, match="Schema validation failed"):
+        validate_schema(config)
+
+def test_supported_terraform_version():
+    config = valid_terraform_config()
+
+    validate_config(config)
+
+
+def test_terraform_does_not_require_package_manager():
+    config = valid_terraform_config()
+
+    validate_config(config)
+
+
+def test_schema_rejects_package_manager_for_terraform():
+    config = valid_terraform_config()
+    config["runtime"]["package_manager"] = "npm"
+
+    with pytest.raises(
+        ConfigurationError,
+        match="Schema validation failed",
+    ):
+        validate_schema(config)
+
+
+def test_schema_accepts_terraform_working_directory():
+    config = valid_terraform_config()
+
+    validate_schema(config)
+
+
+def test_schema_rejects_empty_working_directory():
+    config = valid_terraform_config()
+    config["runtime"]["working_directory"] = ""
+
+    with pytest.raises(
+        ConfigurationError,
+        match="Schema validation failed",
+    ):
         validate_schema(config)

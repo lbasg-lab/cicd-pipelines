@@ -3,14 +3,18 @@
 import argparse
 import sys
 from pathlib import Path
+from typing_extensions import runtime
 
 import yaml
 from jsonschema import Draft202012Validator
 
 
-SUPPORTED_STACKS = {"node"}
+SUPPORTED_STACKS = {"node", "terraform"}
+
 SUPPORTED_NODE_VERSIONS = {"22", "24"}
 SUPPORTED_NODE_PACKAGE_MANAGERS = {"npm"}
+
+SUPPORTED_TERRAFORM_VERSIONS = {"1.16.2"}
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPOSITORY_ROOT = SCRIPT_DIR.parent
@@ -147,6 +151,8 @@ def validate_config(config: dict) -> None:
 
     if stack == "node":
         validate_node_runtime(runtime)
+    elif stack == "terraform":
+        validate_terraform_runtime(runtime)
 
 
 def validate_node_runtime(runtime: dict) -> None:
@@ -182,6 +188,25 @@ def validate_node_runtime(runtime: dict) -> None:
             f"Supported package managers: {supported}"
         )
 
+def validate_terraform_runtime(runtime: dict) -> None:
+    """Validate Terraform-specific configuration rules."""
+
+    version = runtime.get("version")
+
+    if version is None:
+        raise ConfigurationError(
+            "Missing required runtime version for Terraform."
+        )
+
+    version = str(version)
+
+    if version not in SUPPORTED_TERRAFORM_VERSIONS:
+        supported = ", ".join(sorted(SUPPORTED_TERRAFORM_VERSIONS))
+
+        raise ConfigurationError(
+            f"Unsupported Terraform version: {version}\n"
+            f"Supported versions: {supported}"
+        )
 
 def write_github_outputs(
     config: dict,
@@ -194,7 +219,8 @@ def write_github_outputs(
     outputs = {
         "runtime_stack": runtime["stack"],
         "runtime_version": str(runtime["version"]),
-        "package_manager": runtime["package_manager"],
+        "package_manager": runtime.get("package_manager", ""),
+        "working_directory": runtime.get("working_directory", "."),
     }
 
     with output_path.open("a", encoding="utf-8") as file:
