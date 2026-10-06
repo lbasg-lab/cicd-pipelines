@@ -1,4 +1,4 @@
-name: Reusable CI
+name: Reusable CD
 
 on:
   workflow_call:
@@ -9,6 +9,12 @@ on:
         type: string
         default: .cicd-config.yml
 
+      apply:
+        description: Whether the deployment should be applied
+        required: false
+        type: boolean
+        default: false
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -16,7 +22,6 @@ jobs:
     outputs:
       runtime_stack: ${{ steps.validate.outputs.runtime_stack }}
       runtime_version: ${{ steps.validate.outputs.runtime_version }}
-      package_manager: ${{ steps.validate.outputs.package_manager }}
       working_directory: ${{ steps.validate.outputs.working_directory }}
 
     steps:
@@ -47,18 +52,11 @@ jobs:
             "consumer/${{ inputs.config }}" \
             --github-output "$GITHUB_OUTPUT"
 
-  node:
-    needs: validate
-    if: needs.validate.outputs.runtime_stack == 'node'
-    uses: ./.github/workflows/node-ci.yml
-    with:
-      runtime-version: ${{ needs.validate.outputs.runtime_version }}
-      package-manager: ${{ needs.validate.outputs.package_manager }}
-
   terraform:
     needs: validate
     if: needs.validate.outputs.runtime_stack == 'terraform'
-    uses: ./.github/workflows/terraform-ci.yml
+    uses: ./.github/workflows/terraform-cd.yml
     with:
       terraform-version: ${{ needs.validate.outputs.runtime_version }}
       working-directory: ${{ needs.validate.outputs.working_directory }}
+      apply: ${{ inputs.apply }}
