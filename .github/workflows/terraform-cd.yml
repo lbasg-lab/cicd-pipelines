@@ -41,6 +41,7 @@ jobs:
       TF_CLOUD_ORGANIZATION: ${{ inputs.terraform-organization }}
       TF_WORKSPACE: ${{ inputs.terraform-workspace }}
       TF_TOKEN_app_terraform_io: ${{ secrets.HCP_TERRAFORM_TOKEN }}
+      TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
     defaults:
       run:
