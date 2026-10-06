@@ -57,5 +57,5 @@ jobs:
       terraform-version: ${{ needs.validate.outputs.runtime_version }}
       working-directory: ${{ needs.validate.outputs.working_directory }}
       deployment: ${{ needs.validate.outputs.deployment == 'true' }}
-      terraform_organization: ${{ needs.validate.outputs.terraform_organization }}
-      terraform_workspace: ${{ needs.validate.outputs.terraform_workspace }}
+      terraform-organization: ${{ needs.validate.outputs.terraform_organization }}
+      terraform-workspace: ${{ needs.validate.outputs.terraform_workspace }}
