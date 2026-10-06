@@ -215,6 +215,7 @@ def write_github_outputs(
     """Write validated configuration values to GitHub Actions outputs."""
 
     runtime = config["runtime"]
+    terraform = config.get("terraform", {})
 
     outputs = {
         "runtime_stack": runtime["stack"],
@@ -222,6 +223,8 @@ def write_github_outputs(
         "package_manager": runtime.get("package_manager", ""),
         "working_directory": runtime.get("working_directory", "."),
         "deployment": str(config.get("deployment", False)).lower(),
+        "terraform_organization": terraform.get("organization", ""),
+        "terraform_workspace": terraform.get("workspace", ""),
     }
 
     with output_path.open("a", encoding="utf-8") as file:

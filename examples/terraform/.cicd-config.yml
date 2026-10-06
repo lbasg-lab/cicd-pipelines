@@ -5,4 +5,8 @@ runtime:
   version: "1.16.2"
   working_directory: terraform
 
-deployment: true
+terraform:
+  organization: lbasg-lab
+  workspace: terraform-example
+
+deployment: false

@@ -18,6 +18,8 @@ jobs:
       runtime_version: ${{ steps.validate.outputs.runtime_version }}
       working_directory: ${{ steps.validate.outputs.working_directory }}
       deployment: ${{ steps.validate.outputs.deployment }}
+      terraform_organization: ${{ steps.validate.outputs.terraform_organization }}
+      terraform_workspace: ${{ steps.validate.outputs.terraform_workspace }}
 
     steps:
       - name: Checkout consumer repository
@@ -55,3 +57,5 @@ jobs:
       terraform-version: ${{ needs.validate.outputs.runtime_version }}
       working-directory: ${{ needs.validate.outputs.working_directory }}
       deployment: ${{ needs.validate.outputs.deployment == 'true' }}
+      terraform_organization: ${{ needs.validate.outputs.terraform_organization }}
+      terraform_workspace: ${{ needs.validate.outputs.terraform_workspace }}

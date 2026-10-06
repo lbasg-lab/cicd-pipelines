@@ -19,9 +19,23 @@ on:
         required: true
         type: boolean
 
+      terraform-organization:
+        description: HCP Terraform organization
+        required: true
+        type: string
+
+      terraform-workspace:
+        description: HCP Terraform workspace
+        required: true
+        type: string
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
+    env:
+      TF_CLOUD_ORGANIZATION: ${{ inputs.terraform-organization }}
+      TF_WORKSPACE: ${{ inputs.terraform-workspace }}
 
     defaults:
       run:
