@@ -25,6 +25,10 @@ def valid_terraform_config():
             "version": "1.16.2",
             "working_directory": "terraform",
         },
+        "terraform": {
+            "organization": "lbasg-lab",
+            "workspace": "azure-landing-zone",
+        },
     }
 
 @pytest.mark.parametrize("version", ["22", "24"])
@@ -158,4 +162,23 @@ def test_schema_rejects_empty_working_directory():
         ConfigurationError,
         match="Schema validation failed",
     ):
+        validate_schema(config)
+
+def test_schema_accepts_azure_target():
+    config = valid_terraform_config()
+    config["target"] = {
+        "platform": "azure",
+        "subscription_id": "00000000-0000-0000-0000-000000000000",
+    }
+
+    validate_schema(config)
+
+
+def test_schema_rejects_azure_target_without_subscription_id():
+    config = valid_terraform_config()
+    config["target"] = {
+        "platform": "azure",
+    }
+
+    with pytest.raises(ConfigurationError, match="subscription_id"):
         validate_schema(config)

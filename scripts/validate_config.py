@@ -3,7 +3,6 @@
 import argparse
 import sys
 from pathlib import Path
-from typing_extensions import runtime
 
 import yaml
 from jsonschema import Draft202012Validator
@@ -216,6 +215,7 @@ def write_github_outputs(
 
     runtime = config["runtime"]
     terraform = config.get("terraform", {})
+    target = config.get("target", {})
 
     outputs = {
         "runtime_stack": runtime["stack"],
@@ -225,6 +225,8 @@ def write_github_outputs(
         "deployment": str(config.get("deployment", False)).lower(),
         "terraform_organization": terraform.get("organization", ""),
         "terraform_workspace": terraform.get("workspace", ""),
+        "target_platform": target.get("platform", ""),
+        "target_subscription_id": target.get("subscription_id", "")
     }
 
     with output_path.open("a", encoding="utf-8") as file:

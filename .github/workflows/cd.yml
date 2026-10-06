@@ -24,6 +24,8 @@ jobs:
       deployment: ${{ steps.validate.outputs.deployment }}
       terraform_organization: ${{ steps.validate.outputs.terraform_organization }}
       terraform_workspace: ${{ steps.validate.outputs.terraform_workspace }}
+      target_platform: ${{ steps.validate.outputs.target_platform }}
+      target_subscription_id: ${{ steps.validate.outputs.target_subscription_id }}
 
     steps:
       - name: Checkout consumer repository
@@ -63,6 +65,7 @@ jobs:
       deployment: ${{ needs.validate.outputs.deployment == 'true' }}
       terraform-organization: ${{ needs.validate.outputs.terraform_organization }}
       terraform-workspace: ${{ needs.validate.outputs.terraform_workspace }}
-      azure-subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      target-platform: ${{ needs.validate.outputs.target_platform }}
+      target-subscription-id: ${{ needs.validate.outputs.target_subscription_id }}
     secrets:
       HCP_TERRAFORM_TOKEN: ${{ secrets.HCP_TERRAFORM_TOKEN }}

@@ -5,7 +5,10 @@
   "description": "Configuration contract for projects consuming lbasg-lab/cicd-pipelines",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "runtime"],
+  "required": [
+    "version",
+    "runtime"
+  ],
   "properties": {
     "version": {
       "type": "integer",
@@ -15,11 +18,17 @@
     "runtime": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stack", "version"],
+      "required": [
+        "stack",
+        "version"
+      ],
       "properties": {
         "stack": {
           "type": "string",
-          "enum": ["node", "terraform"],
+          "enum": [
+            "node",
+            "terraform"
+          ],
           "description": "Runtime stack used by the project"
         },
         "version": {
@@ -29,7 +38,9 @@
         },
         "package_manager": {
           "type": "string",
-          "enum": ["npm"],
+          "enum": [
+            "npm"
+          ],
           "description": "Package manager used by the runtime"
         },
         "working_directory": {
@@ -45,7 +56,9 @@
               "const": "node"
             }
           },
-          "required": ["package_manager"]
+          "required": [
+            "package_manager"
+          ]
         },
         {
           "properties": {
@@ -54,7 +67,9 @@
             }
           },
           "not": {
-            "required": ["package_manager"]
+            "required": [
+              "package_manager"
+            ]
           }
         }
       ]
@@ -62,7 +77,10 @@
     "terraform": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["organization", "workspace"],
+      "required": [
+        "organization",
+        "workspace"
+      ],
       "properties": {
         "organization": {
           "type": "string",
@@ -79,6 +97,43 @@
     "deployment": {
       "type": "boolean",
       "description": "Whether the deployment stage may apply or deploy changes"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platform"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": [
+            "azure"
+          ],
+          "description": "Target deployment platform"
+        },
+        "subscription_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Azure subscription ID"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "platform": {
+                "const": "azure"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "subscription_id"
+            ]
+          }
+        }
+      ]
     }
   },
   "allOf": [
@@ -95,7 +150,9 @@
         }
       },
       "then": {
-        "required": ["terraform"]
+        "required": [
+          "terraform"
+        ]
       }
     },
     {
@@ -112,7 +169,9 @@
       },
       "then": {
         "not": {
-          "required": ["terraform"]
+          "required": [
+            "terraform"
+          ]
         }
       }
     }
