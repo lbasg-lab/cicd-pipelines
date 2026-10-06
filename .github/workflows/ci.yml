@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: lbasg-lab/cicd-pipelines
-          ref: feature/terraform-ci
+          ref: ${{ job.workflow_sha }}
           path: cicd-pipelines
 
       - name: Setup Python
@@ -50,7 +50,7 @@ jobs:
   node:
     needs: validate
     if: needs.validate.outputs.runtime_stack == 'node'
-    uses: lbasg-lab/cicd-pipelines/.github/workflows/node-ci.yml@feature/terraform-ci
+    uses: ./.github/workflows/node-ci.yml
     with:
       runtime-version: ${{ needs.validate.outputs.runtime_version }}
       package-manager: ${{ needs.validate.outputs.package_manager }}
@@ -58,7 +58,7 @@ jobs:
   terraform:
     needs: validate
     if: needs.validate.outputs.runtime_stack == 'terraform'
-    uses: lbasg-lab/cicd-pipelines/.github/workflows/terraform-ci.yml@feature/terraform-ci
+    uses: ./.github/workflows/terraform-ci.yml
     with:
       terraform-version: ${{ needs.validate.outputs.runtime_version }}
       working-directory: ${{ needs.validate.outputs.working_directory }}
