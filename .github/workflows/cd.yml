@@ -9,12 +9,6 @@ on:
         type: string
         default: .cicd-config.yml
 
-      apply:
-        description: Whether the deployment should be applied
-        required: false
-        type: boolean
-        default: false
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -23,6 +17,7 @@ jobs:
       runtime_stack: ${{ steps.validate.outputs.runtime_stack }}
       runtime_version: ${{ steps.validate.outputs.runtime_version }}
       working_directory: ${{ steps.validate.outputs.working_directory }}
+      deployment: ${{ steps.validate.outputs.deployment }}
 
     steps:
       - name: Checkout consumer repository
@@ -59,4 +54,4 @@ jobs:
     with:
       terraform-version: ${{ needs.validate.outputs.runtime_version }}
       working-directory: ${{ needs.validate.outputs.working_directory }}
-      apply: ${{ inputs.apply }}
+      deployment: ${{ needs.validate.outputs.deployment == 'true' }}

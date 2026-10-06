@@ -14,11 +14,10 @@ on:
         type: string
         default: .
 
-      apply:
-        description: Whether Terraform apply should be executed
-        required: false
+      deployment:
+        description: Whether Terraform changes should be applied
+        required: true
         type: boolean
-        default: false
 
 jobs:
   terraform:
@@ -39,3 +38,13 @@ jobs:
 
       - name: Terraform version
         run: terraform version
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform plan
+        run: terraform plan
+
+      - name: Terraform apply
+        if: inputs.deployment
+        run: terraform apply -auto-approve

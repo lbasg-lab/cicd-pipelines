@@ -221,6 +221,7 @@ def write_github_outputs(
         "runtime_version": str(runtime["version"]),
         "package_manager": runtime.get("package_manager", ""),
         "working_directory": runtime.get("working_directory", "."),
+        "deployment": str(config.get("deployment", False)).lower(),
     }
 
     with output_path.open("a", encoding="utf-8") as file:

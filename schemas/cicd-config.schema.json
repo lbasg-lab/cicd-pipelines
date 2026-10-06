@@ -73,6 +73,10 @@
           }
         }
       ]
+    },
+    "deployment": {
+      "type": "boolean",
+      "description": "Whether the deployment stage may apply or deploy changes"
     }
   }
 }
