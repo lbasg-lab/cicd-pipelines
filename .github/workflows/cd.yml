@@ -8,6 +8,10 @@ on:
         required: false
         type: string
         default: .cicd-config.yml
+    secrets:
+      HCP_TERRAFORM_TOKEN:
+        description: HCP Terraform API token
+        required: false
 
 jobs:
   validate:

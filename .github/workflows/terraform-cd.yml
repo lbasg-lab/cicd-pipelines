@@ -28,6 +28,10 @@ on:
         description: HCP Terraform workspace
         required: true
         type: string
+    secrets:
+      HCP_TERRAFORM_TOKEN:
+        description: HCP Terraform API token
+        required: true
 
 jobs:
   terraform:
@@ -36,6 +40,7 @@ jobs:
     env:
       TF_CLOUD_ORGANIZATION: ${{ inputs.terraform-organization }}
       TF_WORKSPACE: ${{ inputs.terraform-workspace }}
+      TF_TOKEN_app_terraform_io: ${{ secrets.HCP_TERRAFORM_TOKEN }}
 
     defaults:
       run:
