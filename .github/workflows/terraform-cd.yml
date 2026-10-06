@@ -29,11 +29,6 @@ on:
         required: true
         type: string
 
-      azure-subscription-id:
-        description: Azure subscription ID
-        required: true
-        type: string
-
       target-platform:
         description: Target deployment platform
         required: true
