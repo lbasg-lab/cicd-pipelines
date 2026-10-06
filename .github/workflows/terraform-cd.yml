@@ -28,6 +28,12 @@ on:
         description: HCP Terraform workspace
         required: true
         type: string
+
+      azure-subscription-id:
+        description: Azure subscription ID
+        required: true
+        type: string
+
     secrets:
       HCP_TERRAFORM_TOKEN:
         description: HCP Terraform API token

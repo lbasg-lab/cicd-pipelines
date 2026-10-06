@@ -63,5 +63,6 @@ jobs:
       deployment: ${{ needs.validate.outputs.deployment == 'true' }}
       terraform-organization: ${{ needs.validate.outputs.terraform_organization }}
       terraform-workspace: ${{ needs.validate.outputs.terraform_workspace }}
+      azure-subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
     secrets:
       HCP_TERRAFORM_TOKEN: ${{ secrets.HCP_TERRAFORM_TOKEN }}
