@@ -226,7 +226,9 @@ def write_github_outputs(
         "terraform_organization": terraform.get("organization", ""),
         "terraform_workspace": terraform.get("workspace", ""),
         "target_platform": target.get("platform", ""),
-        "target_subscription_id": target.get("subscription_id", "")
+        "target_subscription_id": target.get("subscription_id", ""),
+        "target_tenant_id": target.get("tenant_id", ""),
+        "target_client_id": target.get("client_id", "")
     }
 
     with output_path.open("a", encoding="utf-8") as file:
