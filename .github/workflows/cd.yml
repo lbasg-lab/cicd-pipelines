@@ -13,59 +13,59 @@ on:
         description: HCP Terraform API token
         required: false
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
-
     outputs:
-      runtime_stack: ${{ steps.validate.outputs.runtime_stack }}
-      runtime_version: ${{ steps.validate.outputs.runtime_version }}
-      working_directory: ${{ steps.validate.outputs.working_directory }}
-      deployment: ${{ steps.validate.outputs.deployment }}
-      terraform_organization: ${{ steps.validate.outputs.terraform_organization }}
-      terraform_workspace: ${{ steps.validate.outputs.terraform_workspace }}
-      target_platform: ${{ steps.validate.outputs.target_platform }}
-      target_subscription_id: ${{ steps.validate.outputs.target_subscription_id }}
-
+      runtime_stack: \${{ steps.validate.outputs.runtime_stack }}
+      runtime_version: \${{ steps.validate.outputs.runtime_version }}
+      working_directory: \${{ steps.validate.outputs.working_directory }}
+      deployment: \${{ steps.validate.outputs.deployment }}
+      terraform_organization: \${{ steps.validate.outputs.terraform_organization }}
+      terraform_workspace: \${{ steps.validate.outputs.terraform_workspace }}
+      target_platform: \${{ steps.validate.outputs.target_platform }}
+      target_subscription_id: \${{ steps.validate.outputs.target_subscription_id }}
+      target_tenant_id: \${{ steps.validate.outputs.target_tenant_id }}
+      target_client_id: \${{ steps.validate.outputs.target_client_id }}
     steps:
       - name: Checkout consumer repository
         uses: actions/checkout@v4
         with:
           path: consumer
-
       - name: Checkout CI/CD framework
         uses: actions/checkout@v4
         with:
           repository: lbasg-lab/cicd-pipelines
-          ref: ${{ job.workflow_sha }}
+          ref: \${{ job.workflow_sha }}
           path: cicd-pipelines
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Install framework dependencies
         run: pip install -r cicd-pipelines/requirements.txt
-
       - name: Validate configuration
         id: validate
         run: |
-          python cicd-pipelines/scripts/validate_config.py \
-            "consumer/${{ inputs.config }}" \
-            --github-output "$GITHUB_OUTPUT"
+          python cicd-pipelines/scripts/validate_config.py             "consumer/\${{ inputs.config }}"             --github-output "$GITHUB_OUTPUT"
 
   terraform:
     needs: validate
     if: needs.validate.outputs.runtime_stack == 'terraform'
     uses: ./.github/workflows/terraform-cd.yml
     with:
-      terraform-version: ${{ needs.validate.outputs.runtime_version }}
-      working-directory: ${{ needs.validate.outputs.working_directory }}
-      deployment: ${{ needs.validate.outputs.deployment == 'true' }}
-      terraform-organization: ${{ needs.validate.outputs.terraform_organization }}
-      terraform-workspace: ${{ needs.validate.outputs.terraform_workspace }}
-      target-platform: ${{ needs.validate.outputs.target_platform }}
-      target-subscription-id: ${{ needs.validate.outputs.target_subscription_id }}
+      terraform-version: \${{ needs.validate.outputs.runtime_version }}
+      working-directory: \${{ needs.validate.outputs.working_directory }}
+      deployment: \${{ needs.validate.outputs.deployment == 'true' }}
+      terraform-organization: \${{ needs.validate.outputs.terraform_organization }}
+      terraform-workspace: \${{ needs.validate.outputs.terraform_workspace }}
+      target-platform: \${{ needs.validate.outputs.target_platform }}
+      target-subscription-id: \${{ needs.validate.outputs.target_subscription_id }}
+      target-tenant-id: \${{ needs.validate.outputs.target_tenant_id }}
+      target-client-id: \${{ needs.validate.outputs.target_client_id }}
     secrets:
-      HCP_TERRAFORM_TOKEN: ${{ secrets.HCP_TERRAFORM_TOKEN }}
+      HCP_TERRAFORM_TOKEN: \${{ secrets.HCP_TERRAFORM_TOKEN }}
