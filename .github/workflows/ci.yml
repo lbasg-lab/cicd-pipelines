@@ -9,6 +9,15 @@ on:
         type: string
         default: .cicd-config.yml
 
+    secrets:
+      HCP_TERRAFORM_TOKEN:
+        description: HCP Terraform API token
+        required: false
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -18,6 +27,12 @@ jobs:
       runtime_version: ${{ steps.validate.outputs.runtime_version }}
       package_manager: ${{ steps.validate.outputs.package_manager }}
       working_directory: ${{ steps.validate.outputs.working_directory }}
+      terraform_organization: ${{ steps.validate.outputs.terraform_organization }}
+      terraform_workspace: ${{ steps.validate.outputs.terraform_workspace }}
+      target_platform: ${{ steps.validate.outputs.target_platform }}
+      target_subscription_id: ${{ steps.validate.outputs.target_subscription_id }}
+      target_tenant_id: ${{ steps.validate.outputs.target_tenant_id }}
+      target_client_id: ${{ steps.validate.outputs.target_client_id }}
 
     steps:
       - name: Checkout consumer repository
@@ -28,7 +43,7 @@ jobs:
       - name: Checkout CI/CD framework
         uses: actions/checkout@v4
         with:
-          repository: lbasg-lab/cicd-pipelines
+          repository: ${{ job.workflow_repository }}
           ref: ${{ job.workflow_sha }}
           path: cicd-pipelines
 
@@ -62,3 +77,11 @@ jobs:
     with:
       terraform-version: ${{ needs.validate.outputs.runtime_version }}
       working-directory: ${{ needs.validate.outputs.working_directory }}
+      terraform-organization: ${{ needs.validate.outputs.terraform_organization }}
+      terraform-workspace: ${{ needs.validate.outputs.terraform_workspace }}
+      target-platform: ${{ needs.validate.outputs.target_platform }}
+      target-subscription-id: ${{ needs.validate.outputs.target_subscription_id }}
+      target-tenant-id: ${{ needs.validate.outputs.target_tenant_id }}
+      target-client-id: ${{ needs.validate.outputs.target_client_id }}
+    secrets:
+      HCP_TERRAFORM_TOKEN: ${{ secrets.HCP_TERRAFORM_TOKEN }}

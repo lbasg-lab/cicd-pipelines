@@ -14,9 +14,54 @@ on:
         type: string
         default: .
 
+      terraform-organization:
+        description: HCP Terraform organization
+        required: true
+        type: string
+
+      terraform-workspace:
+        description: HCP Terraform workspace
+        required: true
+        type: string
+
+      target-platform:
+        description: Target deployment platform
+        required: true
+        type: string
+
+      target-subscription-id:
+        description: Azure subscription ID
+        required: true
+        type: string
+
+      target-tenant-id:
+        description: Azure tenant ID
+        required: true
+        type: string
+
+      target-client-id:
+        description: Azure application client ID
+        required: true
+        type: string
+
+    secrets:
+      HCP_TERRAFORM_TOKEN:
+        description: HCP Terraform API token
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
+    env:
+      TF_CLOUD_ORGANIZATION: ${{ inputs.terraform-organization }}
+      TF_WORKSPACE: ${{ inputs.terraform-workspace }}
+      TF_TOKEN_app_terraform_io: ${{ secrets.HCP_TERRAFORM_TOKEN }}
+      TF_VAR_subscription_id: ${{ inputs.target-subscription-id }}
 
     defaults:
       run:
@@ -26,17 +71,29 @@ jobs:
       - name: Checkout consumer repository
         uses: actions/checkout@v4
 
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ inputs.target-client-id }}
+          tenant-id: ${{ inputs.target-tenant-id }}
+          subscription-id: ${{ inputs.target-subscription-id }}
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ inputs.terraform-version }}
 
+      - name: Terraform version
+        run: terraform version
+
       - name: Terraform format check
         run: terraform fmt -check -recursive
 
       - name: Terraform init
-        run: terraform init -backend=false
+        run: terraform init
 
       - name: Terraform validate
         run: terraform validate
-        
+
+      - name: Terraform plan
+        run: terraform plan
