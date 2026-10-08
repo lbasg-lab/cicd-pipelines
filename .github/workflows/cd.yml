@@ -1,4 +1,4 @@
-name: Reusable CI
+name: Reusable CD
 
 on:
   workflow_call:
@@ -25,8 +25,8 @@ jobs:
     outputs:
       runtime_stack: ${{ steps.validate.outputs.runtime_stack }}
       runtime_version: ${{ steps.validate.outputs.runtime_version }}
-      package_manager: ${{ steps.validate.outputs.package_manager }}
       working_directory: ${{ steps.validate.outputs.working_directory }}
+      deployment: ${{ steps.validate.outputs.deployment }}
       terraform_organization: ${{ steps.validate.outputs.terraform_organization }}
       terraform_workspace: ${{ steps.validate.outputs.terraform_workspace }}
       target_platform: ${{ steps.validate.outputs.target_platform }}
@@ -43,7 +43,7 @@ jobs:
       - name: Checkout CI/CD framework
         uses: actions/checkout@v4
         with:
-          repository: ${{ job.workflow_repository }}
+          repository: lbasg-lab/cicd-pipelines
           ref: ${{ job.workflow_sha }}
           path: cicd-pipelines
 
@@ -62,21 +62,14 @@ jobs:
             "consumer/${{ inputs.config }}" \
             --github-output "$GITHUB_OUTPUT"
 
-  node:
-    needs: validate
-    if: needs.validate.outputs.runtime_stack == 'node'
-    uses: ./.github/workflows/node-ci.yml
-    with:
-      runtime-version: ${{ needs.validate.outputs.runtime_version }}
-      package-manager: ${{ needs.validate.outputs.package_manager }}
-
   terraform:
     needs: validate
     if: needs.validate.outputs.runtime_stack == 'terraform'
-    uses: ./.github/workflows/terraform-ci.yml
+    uses: ./.github/workflows/terraform-cd.yml
     with:
       terraform-version: ${{ needs.validate.outputs.runtime_version }}
       working-directory: ${{ needs.validate.outputs.working_directory }}
+      deployment: ${{ needs.validate.outputs.deployment == 'true' }}
       terraform-organization: ${{ needs.validate.outputs.terraform_organization }}
       terraform-workspace: ${{ needs.validate.outputs.terraform_workspace }}
       target-platform: ${{ needs.validate.outputs.target_platform }}

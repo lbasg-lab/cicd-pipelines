@@ -17,6 +17,19 @@ def valid_config():
         },
     }
 
+def valid_terraform_config():
+    return {
+        "version": 1,
+        "runtime": {
+            "stack": "terraform",
+            "version": "1.16.2",
+            "working_directory": "terraform",
+        },
+        "terraform": {
+            "organization": "lbasg-lab",
+            "workspace": "azure-landing-zone",
+        },
+    }
 
 @pytest.mark.parametrize("version", ["22", "24"])
 def test_supported_node_version(version):
@@ -110,4 +123,62 @@ def test_schema_rejects_unknown_runtime_property():
     config["runtime"]["node_version"] = "24"
 
     with pytest.raises(ConfigurationError, match="Schema validation failed"):
+        validate_schema(config)
+
+def test_supported_terraform_version():
+    config = valid_terraform_config()
+
+    validate_config(config)
+
+
+def test_terraform_does_not_require_package_manager():
+    config = valid_terraform_config()
+
+    validate_config(config)
+
+
+def test_schema_rejects_package_manager_for_terraform():
+    config = valid_terraform_config()
+    config["runtime"]["package_manager"] = "npm"
+
+    with pytest.raises(
+        ConfigurationError,
+        match="Schema validation failed",
+    ):
+        validate_schema(config)
+
+
+def test_schema_accepts_terraform_working_directory():
+    config = valid_terraform_config()
+
+    validate_schema(config)
+
+
+def test_schema_rejects_empty_working_directory():
+    config = valid_terraform_config()
+    config["runtime"]["working_directory"] = ""
+
+    with pytest.raises(
+        ConfigurationError,
+        match="Schema validation failed",
+    ):
+        validate_schema(config)
+
+def test_schema_accepts_azure_target():
+    config = valid_terraform_config()
+    config["target"] = {
+        "platform": "azure",
+        "subscription_id": "00000000-0000-0000-0000-000000000000",
+    }
+
+    validate_schema(config)
+
+
+def test_schema_rejects_azure_target_without_subscription_id():
+    config = valid_terraform_config()
+    config["target"] = {
+        "platform": "azure",
+    }
+
+    with pytest.raises(ConfigurationError, match="subscription_id"):
         validate_schema(config)

@@ -1,0 +1,103 @@
+name: Reusable Terraform CD
+
+on:
+  workflow_call:
+    inputs:
+      terraform-version:
+        description: Terraform version to use
+        required: true
+        type: string
+
+      working-directory:
+        description: Terraform working directory
+        required: false
+        type: string
+        default: .
+
+      deployment:
+        description: Whether Terraform changes should be applied
+        required: true
+        type: boolean
+
+      terraform-organization:
+        description: HCP Terraform organization
+        required: true
+        type: string
+
+      terraform-workspace:
+        description: HCP Terraform workspace
+        required: true
+        type: string
+
+      target-platform:
+        description: Target deployment platform
+        required: true
+        type: string
+
+      target-subscription-id:
+        description: Azure subscription ID
+        required: true
+        type: string
+
+      target-tenant-id:
+        description: Azure tenant ID
+        required: true
+        type: string
+
+      target-client-id:
+        description: Azure application client ID
+        required: true
+        type: string
+
+    secrets:
+      HCP_TERRAFORM_TOKEN:
+        description: HCP Terraform API token
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_CLOUD_ORGANIZATION: ${{ inputs.terraform-organization }}
+      TF_WORKSPACE: ${{ inputs.terraform-workspace }}
+      TF_TOKEN_app_terraform_io: ${{ secrets.HCP_TERRAFORM_TOKEN }}
+      TF_VAR_subscription_id: ${{ inputs.target-subscription-id }}
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - name: Checkout consumer repository
+        uses: actions/checkout@v4
+
+      - name: Azure login
+        if: inputs.deployment
+        uses: azure/login@v2
+        with:
+          client-id: ${{ inputs.target-client-id }}
+          tenant-id: ${{ inputs.target-tenant-id }}
+          subscription-id: ${{ inputs.target-subscription-id }}
+
+      - name: Setup Terraform
+        if: inputs.deployment
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
+
+      - name: Terraform version
+        if: inputs.deployment
+        run: terraform version
+
+      - name: Terraform init
+        if: inputs.deployment
+        run: terraform init
+
+      - name: Terraform apply
+        if: inputs.deployment
+        run: terraform apply -auto-approve

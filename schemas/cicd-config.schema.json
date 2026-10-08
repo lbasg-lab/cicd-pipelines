@@ -20,14 +20,14 @@
       "additionalProperties": false,
       "required": [
         "stack",
-        "version",
-        "package_manager"
+        "version"
       ],
       "properties": {
         "stack": {
           "type": "string",
           "enum": [
-            "node"
+            "node",
+            "terraform"
           ],
           "description": "Runtime stack used by the project"
         },
@@ -42,8 +42,150 @@
             "npm"
           ],
           "description": "Package manager used by the runtime"
+        },
+        "working_directory": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Working directory for the stack relative to the repository root"
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "stack": {
+              "const": "node"
+            }
+          },
+          "required": [
+            "package_manager"
+          ]
+        },
+        {
+          "properties": {
+            "stack": {
+              "const": "terraform"
+            }
+          },
+          "not": {
+            "required": [
+              "package_manager"
+            ]
+          }
+        }
+      ]
+    },
+    "terraform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "organization",
+        "workspace"
+      ],
+      "properties": {
+        "organization": {
+          "type": "string",
+          "minLength": 1,
+          "description": "HCP Terraform organization"
+        },
+        "workspace": {
+          "type": "string",
+          "minLength": 1,
+          "description": "HCP Terraform workspace"
+        }
+      }
+    },
+    "deployment": {
+      "type": "boolean",
+      "description": "Whether the deployment stage may apply or deploy changes"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platform"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": [
+            "azure"
+          ],
+          "description": "Target deployment platform"
+        },
+        "subscription_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Azure subscription ID"
+        },
+        "tenant_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Azure tenant ID"
+        },
+        "client_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Azure application client ID"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "platform": {
+                "const": "azure"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "subscription_id",
+              "tenant_id",
+              "client_id"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "properties": {
+              "stack": {
+                "const": "terraform"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "terraform"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "properties": {
+              "stack": {
+                "const": "node"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "terraform"
+          ]
         }
       }
     }
-  }
+  ]
 }
